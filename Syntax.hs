@@ -9,15 +9,17 @@ data IngredientExp  = IngredientExp Quantity IngredientExp
                     deriving Show
 data IngredientLit  = IngredientLit String deriving Show
 
-data DefaultQuantityDecl = DefaultQuantityDecl Quantity String
+data DefaultQuantityDecl = DefaultQuantityDecl Quantity IngredientLit
+                         deriving Show
 
 data Action     = Action String [(String, String)] deriving Show
-data ActionDecl = ActionDecl String Action
+data ActionDecl = ActionDecl String Action deriving Show
 
 data Quantity = Count (Ratio Integer)
               | Amount (Ratio Integer) Unit
               deriving Show
               
 data Unit     = Unit String deriving Show
-data UnitDecl = UnitDecl Quantity String Quantity Unit
+data UnitDecl = UnitDecl (Ratio Integer) String (Ratio Integer) Unit
+              deriving Show
 

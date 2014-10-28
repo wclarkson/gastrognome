@@ -2,8 +2,7 @@ module Syntax where
 import Data.Ratio
 
 data IngredientDecl = IngredientDecl String IngredientExp deriving Show
-data IngredientExp  = IngredientExp Quantity IngredientExp
-                    | IngredientQuantity Quantity IngredientLit
+data IngredientExp  = IngredientQuantity Quantity IngredientLit
                     | IngredientName IngredientLit
                     | IngredientAction Action [IngredientExp]
                     deriving Show

@@ -1,13 +1,50 @@
 module Parser where
 
 import Data.Ratio
-import Text.ParserCombinators.Parsec
-import qualified Text.ParserCombinators.Parsec.Token as Token
-import Text.ParserCombinators.Parsec.Language
+import Text.ParserCombinators.Parsec.Prim (GenParser)
+import Text.ParserCombinators.Parsec hiding (State, Parser, parse)
+import Text.Parsec.Prim (ParsecT, runParserT)
+import Text.Parsec.Pos (SourcePos)
+import Text.Parsec.Indent
+import Control.Monad.State
+import Text.Parsec.String ()
+
 import Syntax
 
-natural :: Parser Integer
-natural = Token.natural (Token.makeTokenParser emptyDef)
+type Parser a = ParsecT String () (State SourcePos) a
+
+parse :: Parser a -> SourceName -> String -> Either ParseError a
+parse p source input = runIndent source $ runParserT p () source input
+
+parseNatural :: Parser Integer
+parseNatural = do
+  { d  <- oneOf "123456789"
+  ; ds <- many digit
+  ; return (read (d:ds))
+  }
+
+parseLabel :: Parser String
+parseLabel = do
+  { label <- many1 upper
+  ; char ':'
+  ; spaces
+  ; return label
+  }
+
+parseItem :: Parser String
+parseItem = do
+  { item <- many1 lower
+  ; spaces
+  ; return item
+  }
+
+parseList :: Parser (String, [String])
+parseList = do
+  {
+  ; b <- withBlock (\x y -> (x, y)) parseLabel parseItem
+  ; spaces
+  ; return b
+  }
 
 word :: Parser String
 word = many1 (noneOf " ")
@@ -35,10 +72,30 @@ quoted p = do
 
 fraction :: Parser (Ratio Integer)
 fraction = do
-  numerator <- natural
+  numerator <- parseNatural
   char '/'
-  denominator <- natural
+  denominator <- parseNatural
   return (numerator % denominator)
+
+parseIngredientQuantity :: Parser IngredientExp
+parseIngredientQuantity = do
+  { quantity <- parseQuantity
+  ; spaces
+  ; ingredient <- parseIngredientLit
+  ; return (IngredientQuantity quantity ingredient)
+  }
+
+parseIngredientName :: Parser IngredientExp
+parseIngredientName = parseIngredientLit >>= return . IngredientName
+
+parseIngredientAction :: Parser IngredientExp
+parseIngredientAction = withBlock IngredientAction parseAction parseIngredientExp
+
+parseIngredientExp :: Parser IngredientExp
+parseIngredientExp =
+  (try parseIngredientQuantity) {-<|>
+  (try parseIngredientAction) <|>
+  parseIngredientName -}
 
 parseIngredientLit :: Parser IngredientLit
 parseIngredientLit = capWord >>= return . IngredientLit
@@ -78,11 +135,14 @@ parseActionDecl = do
   ; return (ActionDecl newAction exAction)
   }
 
+parseCountFraction :: Parser Quantity
+parseCountFraction = try (fraction >>= \f -> return $ Count f)
+
+parseCountNatural :: Parser Quantity
+parseCountNatural = (parseNatural >>= \c -> return $ Count (c % 1))
 
 parseCount :: Parser Quantity
-parseCount =
-  try (fraction >>= \f -> return $ Count f) <|>
-  (natural >>= \c -> return $ Count (c % 1))
+parseCount = parseCountFraction <|> parseCountNatural
 
 parseAmount :: Parser Quantity
 parseAmount = do

@@ -1,7 +1,7 @@
 module Syntax where
 import Data.Ratio
 
-data IngredientDecl = IngredientDecl String IngredientExp deriving Show
+data IngredientDecl = IngredientDecl String IngredientExp
 data IngredientExp  = IngredientQuantity Quantity IngredientLit
                     | IngredientName IngredientLit
                     | IngredientAction Action [IngredientExp]
@@ -19,12 +19,18 @@ data Quantity = Count (Ratio Integer)
 data Unit     = Unit String
 data UnitDecl = UnitDecl (Ratio Integer) String (Ratio Integer) Unit
 
+indent :: [String] -> [String]
+indent ls = map ("\t"++) ls
+
+instance Show IngredientDecl where
+  show (IngredientDecl name exp) =
+    unlines $ (name ++ ":") : (indent (lines $ show exp))
+
 instance Show IngredientExp where
   show (IngredientQuantity quantity lit) = unwords [show quantity, show lit]
   show (IngredientName lit) = show lit
   show (IngredientAction action exps) =
-    let indent ls = map ("\t"++) ls
-    in unlines $ (show action) : (indent (concatMap (lines . show) exps))
+    unlines $ (show action) : (indent (concatMap (lines . show) exps))
 
 instance Show IngredientLit where
   show (IngredientLit lit) = lit

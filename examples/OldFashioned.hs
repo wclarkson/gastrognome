@@ -1,34 +1,39 @@
+module Examples.OldFashioned where
+
 import Syntax
+
+import Data.Ratio
+
 
 oldFashionedText = 
   unlines [
-    "1 shot = 2 floz"
-    "1 dash = 1/32 oz"
-    "1 splash = 4 dash"
-    ""
-    "Flavor Mix:"
-    "  MUDDLE until \"paste\""
-    "    MIX"
-    "      1 tsp Sugar"
-    "      1 splash Water"
-    "      2 dash Angostura Bitters"
-    "    1 Maraschino Cherry"
-    "    1 Orange Wedge"
-    ""
-    "Old Fashioned:"
-    "  STIR in \"old-fashioned glass\""
-    "    Ice Cubes"
-    "    POUR"
-    "      1 shot Bourbon"
+    "1 shot = 2 floz",
+    "1 dash = 1/32 oz",
+    "1 splash = 4 dash",
+    "",
+    "Flavor Mix:",
+    "  MUDDLE until \"paste\"",
+    "    MIX",
+    "      1 tsp Sugar",
+    "      1 splash Water",
+    "      2 dash Angostura Bitters",
+    "    1 Maraschino Cherry",
+    "    1 Orange Wedge",
+    "",
+    "Old Fashioned:",
+    "  STIR in \"old-fashioned glass\"",
+    "    Ice Cubes",
+    "    POUR",
+    "      1 shot Bourbon",
     "      Flavor Mix"
   ]
 
-oldFashioendAST = [
-    shot,
-    dash,
-    splash,
-    flavorMix,
-    oldFashioned
+oldFashionedAST = Program [
+    PUnitDecl shot,
+    PUnitDecl dash,
+    PUnitDecl splash,
+    PIngredientDecl flavorMix,
+    PIngredientDecl oldFashioned
   ]
 
 shot   = UnitDecl 1 "shot"   2      (Unit "floz")
@@ -43,9 +48,8 @@ bitters = IngredientQuantity
 cherry = IngredientQuantity (Count 1) (IngredientLit "Cherry")
 orange = IngredientQuantity (Count 1) (IngredientLit "Orange Wedge")
 
-flavorMix :: IngredientDecl
 flavorMix =
-  IngredientDecl "Flavor Mix"
+  IngredientDecl (IngredientLit "Flavor Mix")
       (IngredientAction
         (Action "MUDDLE" [])
         [
@@ -63,9 +67,8 @@ bourbon = IngredientQuantity
 iceCubes = IngredientQuantity (Count 1) (IngredientLit "Ice Cube")
 
 
-oldFashioned :: IngredientDecl
 oldFashioned =
-  IngredientDecl "Old Fashioned"
+  IngredientDecl (IngredientLit "Old Fashioned")
     (IngredientAction
           (Action "STIR" [])
           [

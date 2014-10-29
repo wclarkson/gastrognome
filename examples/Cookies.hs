@@ -1,56 +1,61 @@
+module Examples.Cookies where
+
 import Syntax
+
+import Data.Ratio
+
 
 cookiesText =
   unlines [
-    "2 1/4 cups Flour"
-    "1 tsp Baking Soda"
-    "1 tsp Salt"
-    "1 cup Butter"
-    "3/4 cup Granulated Sugar"
-    "3/4 cup Brown Sugar"
-    "1 tsp Vanilla Extract"
-    "2 Egg"
-    "2 cups Chocolate Chips"
+    "2 1/4 cups Flour",
+    "1 tsp Baking Soda",
+    "1 tsp Salt",
+    "1 cup Butter",
+    "3/4 cup Granulated Sugar",
+    "3/4 cup Brown Sugar",
+    "1 tsp Vanilla Extract",
+    "2 Egg",
+    "2 cups Chocolate Chips",
 
-    "Prepared Oven:"
-    "  PREHEAT to \"375 F\""
-    "    Oven"
+    "Prepared Oven:",
+    "  PREHEAT to \"375 F\"",
+    "    Oven",
 
-    "Dry Ingredients:"
-    "  MIX"
-    "    Flour"
-    "    Baking Soda"
-    "    Salt"
+    "Dry Ingredients:",
+    "  MIX",
+    "    Flour",
+    "    Baking Soda",
+    "    Salt",
 
-    "Wet Ingredients:"
-    "  BEAT"
-    "    BEAT"
-    "      Butter"
-    "      Granulated Sugar"
-    "      Brown Sugar"
-    "      Vanilla Extract"
-    "    Egg"
+    "Wet Ingredients:",
+    "  BEAT",
+    "    BEAT",
+    "      Butter",
+    "      Granulated Sugar",
+    "      Brown Sugar",
+    "      Vanilla Extract",
+    "    Egg",
 
-    "Cookie Dough:"
-    "  STIR"
-    "    BEAT"
-    "      Wet Ingredients"
-    "      Dry Ingredients"
-    "    Chocolate Chips"
+    "Cookie Dough:",
+    "  STIR",
+    "    BEAT",
+    "      Wet Ingredients",
+    "      Dry Ingredients",
+    "    Chocolate Chips",
 
-    "Cookies:"
-    "  COOL for \"2 min\""
-    "    BAKE for \"9-11 min\" in \"Prepared Oven\""
-    "      SEPARATE by 1 tbsp"
+    "Cookies:",
+    "  COOL for \"2 min\"",
+    "    BAKE for \"9-11 min\" in \"Prepared Oven\"",
+    "      SEPARATE by 1 tbsp",
     "        Cookie Dough"
   ]
 
-cookiesAST = [
-  preparedOven,
-  dryIngredients,
-  wetIngredients,
-  cookieDough,
-  cookies
+cookiesAST = Program [
+  PIngredientDecl preparedOven,
+  PIngredientDecl dryIngredients,
+  PIngredientDecl wetIngredients,
+  PIngredientDecl cookieDough,
+  PIngredientDecl cookies
   ]
 
 flour = IngredientQuantity
@@ -75,7 +80,7 @@ vanillaExtract = IngredientQuantity
           (Amount 1 (Unit "tsp"))
           (IngredientLit "Vanilla Extract")
 eggs = IngredientQuantity
-          (Amount (Count 2))
+          (Count 2)
           (IngredientLit "Egg")
 chocolateChips = IngredientQuantity
           (Amount 2 (Unit "cups"))
@@ -83,13 +88,13 @@ chocolateChips = IngredientQuantity
 
 
 preparedOven =
-  IngredientDecl "Prepared Oven"
+  IngredientDecl (IngredientLit "Prepared Oven")
     (IngredientAction
       (Action "PREHEAT" [("to", "375 F")])
-      [IngredientLit "Oven"])
+      [IngredientName $ IngredientLit "Oven"])
 
 dryIngredients =
-  IngredientDecl "Dry Ingredients"
+  IngredientDecl (IngredientLit "Dry Ingredients")
     (IngredientAction
       (Action "MIX" [])
       [
@@ -99,37 +104,41 @@ dryIngredients =
       ])
 
 wetIngredients =
-  IngredientDecl "Wet Ingredients"
+  IngredientDecl (IngredientLit "Wet Ingredients")
     (IngredientAction
-      (Action "Beat" [])
+      (Action "BEAT" [])
       [
         (IngredientAction
-          (Action "Beat" [])
+          (Action "BEAT" [])
           [
             butter,
             granulatedSugar,
             brownSugar,
             vanillaExtract
-          ])
-          eggs
+          ]),
+        eggs
       ])
 
 cookieDough =
-  IngredientDecl "Cookie Dough"
+  let IngredientDecl _ wet = wetIngredients
+      IngredientDecl _ dry = dryIngredients
+  in
+  IngredientDecl (IngredientLit "Cookie Dough")
     (IngredientAction
       (Action "STIR" [])
       [
         (IngredientAction
           (Action "BEAT" [])
           [
-            wetIngredients,
-            dryIngredients
-          ])
+            wet,
+            dry
+          ]),
           chocolateChips
       ])
 
 cookies =
-  IngredientDecl "Cookies"
+  let IngredientDecl _ dough = cookieDough in
+  IngredientDecl (IngredientLit "Cookies")
     (IngredientAction
       (Action "Cool" [("for", "2 min")])
       [
@@ -138,4 +147,4 @@ cookies =
           [
             (IngredientAction
               (Action "SEPARATE" [("by", "1 tbsp")])
-              [cookieDough])])])
+              [dough])])])

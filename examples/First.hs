@@ -1,9 +1,14 @@
+module Examples.First where
+
 import Parser
 import Syntax
+import Examples.Waffles
 import Examples.OldFashioned
+import Examples.Cookies
 
 import Test.HUnit
 import Text.Parsec.Error
+
 
 instance Eq ParseError where
   (==) e1 e2 = (errorPos e1 == errorPos e2) &&

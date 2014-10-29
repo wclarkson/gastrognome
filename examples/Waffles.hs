@@ -1,38 +1,43 @@
+module Examples.Waffles where
+
 import Syntax
+
+import Data.Ratio
+
 
 wafflesText =
   unlines [
-    "Dry Ingredients:"
-    "  MIX"
-    "    2 cup Flour"
-    "    1 tablespoon Sugar"
-    "    4 teaspoon Baking Powder"
-    "    1/4 tsp Salt"
+    "Dry Ingredients:",
+    "  MIX",
+    "    2 cup Flour",
+    "    1 tablespoon Sugar",
+    "    4 teaspoon Baking Powder",
+    "    1/4 tsp Salt",
 
-    "Batter:"
-    "  BEAT in \"large bowl\" until \"smooth\""
-    "    BEAT until \"fluffy\""
-    "      2 Egg"
-    "    Dry Ingredients"
-    "    1.75 cup Milk"
-    "    1/2 cup Vegetable Oil"
-    "    1/2 tsp Vanilla"
+    "Batter:",
+    "  BEAT in \"large bowl\" until \"smooth\"",
+    "    BEAT until \"fluffy\"",
+    "      2 Egg",
+    "    Dry Ingredients",
+    "    1.75 cup Milk",
+    "    1/2 cup Vegetable Oil",
+    "    1/2 tsp Vanilla",
 
-    "Prepared Waffle Iron:"
-    "  SPRAY with \"Cooking Spray\""
-    "    PREHEAT for \"15 min\""
-    "      Waffle Iron"
+    "Prepared Waffle Iron:",
+    "  SPRAY with \"Cooking Spray\"",
+    "    PREHEAT for \"15 min\"",
+    "      Waffle Iron",
 
-    "Waffles:"
-    "  COOK at \"300 F\" in \"Prepared Waffle Iron\" until \"golden brown\""
+    "Waffles:",
+    "  COOK at \"300 F\" in \"Prepared Waffle Iron\" until \"golden brown\"",
     "    Batter"
   ]
 
-wafflesAST = [
-  dryIngredients,
-  batter,
-  preparedWaffleIron,
-  waffles
+wafflesAST = Program [
+  PIngredientDecl dryIngredients,
+  PIngredientDecl batter,
+  PIngredientDecl preparedWaffleIron,
+  PIngredientDecl waffles
   ]
 
 flour = IngredientQuantity
@@ -49,7 +54,7 @@ salt = IngredientQuantity
           (IngredientLit "Salt")
 
 dryIngredients =
-  IngredientDecl "Dry Ingredients"
+  IngredientDecl (IngredientLit "Dry Ingredients")
     (IngredientAction
       (Action "MIX" [])
       [
@@ -57,16 +62,16 @@ dryIngredients =
         sugar,
         bakingPowder,
         salt
-      ]
+      ])
 
 batter =
-  IngredientDecl "Batter"
+  IngredientDecl (IngredientLit "Batter")
     (IngredientAction
       (Action "BEAT" [("in", "large bowl"), ("until", "smooth")])
       [
         (IngredientAction
           (Action "BEAT" [("until", "fluffy")])
-          [IngredientQuantity (Count 2) (IngredientLit "Egg")])
+          [IngredientQuantity (Count 2) (IngredientLit "Egg")]),
         flour,
         sugar,
         bakingPowder,
@@ -75,20 +80,21 @@ batter =
 
 
 preparedWaffleIron =
-  IngredientDecl "Prepared Waffle Iron"
+  IngredientDecl (IngredientLit "Prepared Waffle Iron")
     (IngredientAction
       (Action "SPRAY" [("with", "Cooking Spray")])
       [
         (IngredientAction
           (Action "PREHEAT" [("for", "15 min")])
           [
-            IngredientLit "Waffle Iron"
+            IngredientName $ IngredientLit "Waffle Iron"
           ]
         )
       ])
 
 waffles =
-  IngredientDecl "Waffles"
+  let IngredientDecl _ waffleBatter = batter in
+  IngredientDecl (IngredientLit "Waffles")
     (IngredientAction
       (Action "COOK" [("at", "300 F"), ("in", "Prepared Waffle Iron"), ("until", "golden brown")])
-      [batter])
+      [waffleBatter])

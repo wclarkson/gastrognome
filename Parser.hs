@@ -106,11 +106,6 @@ parseIngredientExp =
   (try parseIngredientAction) <|>
   parseIngredientName
 
-declTest = unlines [
-    "Cat:",
-    " Dog"
-  ]
-
 -- Works like withBlock, but only allows a single indented parse of p
 with1Block f a p = withPos $ do
   { r1 <- a
@@ -125,7 +120,7 @@ with1Block f a p = withPos $ do
 parseIngredientDecl :: Parser IngredientDecl
 parseIngredientDecl =
   let parseName = do
-        { name <- capWord
+        { name <- parseIngredientLit
         ; char ':'
         ; spaces
         ; return name
@@ -133,7 +128,7 @@ parseIngredientDecl =
   in with1Block IngredientDecl parseName parseIngredientExp
 
 parseIngredientLit :: Parser IngredientLit
-parseIngredientLit = capWord >>= return . IngredientLit
+parseIngredientLit = (sepBy1 capWord spaces) >>= return . IngredientLit . unwords
 
 parseDefaultQuantityDecl :: Parser DefaultQuantityDecl
 parseDefaultQuantityDecl = do

@@ -5,32 +5,35 @@ import Data.Ratio
   Abstract Syntax Datatypes
 -}
 
-data Program        = Program [ProgramDecl]
+data Program        = Program [ProgramDecl] deriving Eq
 
 data ProgramDecl    = PIngredientDecl IngredientDecl
                     | PDefaultQuantityDecl DefaultQuantityDecl
                     | PActionDecl ActionDecl
                     | PUnitDecl UnitDecl
+                    deriving Eq
 
 -- Ingredients
-data IngredientDecl = IngredientDecl String IngredientExp
+data IngredientDecl = IngredientDecl String IngredientExp deriving Eq
 data IngredientExp  = IngredientQuantity Quantity IngredientLit
                     | IngredientName IngredientLit
                     | IngredientAction Action [IngredientExp]
+                    deriving Eq
 data IngredientLit  = IngredientLit String deriving Eq
 
 -- Quantities
-data DefaultQuantityDecl = DefaultQuantityDecl Quantity IngredientLit
+data DefaultQuantityDecl = DefaultQuantityDecl Quantity IngredientLit deriving Eq
 data Quantity = Count (Ratio Integer)
               | Amount (Ratio Integer) Unit
+              deriving Eq
 
 -- Actions
-data Action     = Action String [(String, String)]
-data ActionDecl = ActionDecl String Action
+data Action     = Action String [(String, String)] deriving Eq
+data ActionDecl = ActionDecl String Action deriving Eq
               
 -- Units
-data Unit     = Unit String
-data UnitDecl = UnitDecl (Ratio Integer) String (Ratio Integer) Unit
+data Unit     = Unit String deriving Eq
+data UnitDecl = UnitDecl (Ratio Integer) String (Ratio Integer) Unit deriving Eq
 
 
 {-

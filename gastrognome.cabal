@@ -19,7 +19,7 @@ synopsis:            A language to represent recipes for cooking.
 -- description:         
 
 -- The license under which the package is released.
--- license:             
+-- license:             None
 
 -- The file containing the license text.
 license-file:        LICENSE

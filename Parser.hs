@@ -1,5 +1,7 @@
 module Parser where
 
+import Syntax
+
 import Data.Ratio
 import Text.Parsec hiding (State, Parser, parse)
 import Text.Parsec.Prim (ParsecT, runParserT)
@@ -9,7 +11,6 @@ import Control.Monad.State
 import Text.Parsec.Token
 import Text.Parsec.String ()
 
-import Syntax
 
 type Parser a = ParsecT String () (State SourcePos) a
 
@@ -73,8 +74,8 @@ fraction = do
   Program parser
 -}
 
-programParser :: Parser Program
-programParser =
+parseProgram :: Parser Program
+parseProgram =
   let parseDecl    = try (parseIngredientDecl >>= return . PIngredientDecl) <|>
                      try (parseDefaultQuantityDecl >>=
                        return . PDefaultQuantityDecl) <|>

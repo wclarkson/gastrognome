@@ -22,13 +22,11 @@
 
 <ingredient-decl> ::= <upper>\texttt{:} NEWLINE INDENT <ingredient-exp> DEDENT
 
-<ingredient-exp> ::= <ingredient-quantity> | <ingredient-name> | <ingredient-action>
+<ingredient-exp> ::= <ingredient-quantity> | <ingredient-lit> | <ingredient-action>
 
 <ingredient-quantity> ::= <quantity> <ingredient-lit>
 
-<ingredient-name> ::= <ingredient-lit>
-
-<ingredient-action> ::= <action> NEWLINE INDENT <ingredient-exp>+ DEDENT
+<ingredient-action> ::= <action> NEWLINE INDENT (<ingredient-exp> NEWLINE)+ DEDENT
 
 <ingredient-lit> ::= <upper>  
 
@@ -36,11 +34,15 @@
 
 <quantity> ::= <count> | <amount>
 
-<count> ::= <natural>\texttt{/}<natural>
+<number> ::= <natural> | <fraction>
 
-<amount> ::= <count> <unit>
+<count> ::= <number>
 
-<action> ::= <upper> (<lower> \texttt{\"}(<lower> )+\texttt{\"})
+<fraction> ::= <natural>\texttt{/}<natural>
+
+<amount> ::= <number> <unit>
+
+<action> ::= <upper> (<lower> \texttt{\"}(<lower> )+\texttt{\"})+
 
 <action-decl> ::= <all-upper> \texttt{=} <action>
 

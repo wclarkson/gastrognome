@@ -14,7 +14,8 @@ data ProgramDecl    = PIngredientDecl IngredientDecl
                     deriving Eq
 
 -- Ingredients
-data IngredientDecl = IngredientDecl String IngredientExp deriving Eq
+data IngredientDecl = IngredientDecl IngredientLit IngredientExp deriving Eq
+data IngredientDecl = IngredientDecl IngredientLit IngredientExp
 data IngredientExp  = IngredientQuantity Quantity IngredientLit
                     | IngredientName IngredientLit
                     | IngredientAction Action [IngredientExp]
@@ -53,7 +54,7 @@ instance Show ProgramDecl where
   show (PUnitDecl d) = show d
 
 instance Show IngredientDecl where
-  show (IngredientDecl name exp) =
+  show (IngredientDecl (IngredientLit name) exp) =
     unlines $ (name ++ ":") : (indent (lines $ show exp))
 
 instance Show IngredientExp where

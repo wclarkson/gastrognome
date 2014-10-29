@@ -1,0 +1,63 @@
+\documentclass{article}
+\title{ GastroGnome Grammar}
+\usepackage{fullpage}
+\usepackage{syntax}
+\author{William Clarkson and Andrew Mendelsohn}
+\date{October 28, 2014}
+
+\setlength{\grammarindent}{6em}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{empty}
+
+\begin{grammar}
+<program>         ::= <program-decl>*
+
+<program-decl>    ::= <ingredient-decl>
+				  | <default-quantity-decl>
+				  | <action-decl>
+				  | <unit-decl>
+
+<ingredient-decl> ::= <upper>\texttt{:} NEWLINE INDENT <ingredient-exp> DEDENT
+
+<ingredient-exp> ::= <ingredient-quantity> | <ingredient-name> | <ingredient-action>
+
+<ingredient-quantity> ::= <quantity> <ingredient-lit>
+
+<ingredient-name> ::= <ingredient-lit>
+
+<ingredient-action> ::= <action> NEWLINE INDENT <ingredient-exp>+ DEDENT
+
+<ingredient-lit> ::= <upper>  
+
+<default-quantity-decl> ::= <quantity> <ingredient-lit>
+
+<quantity> ::= <count> | <amount>
+
+<count> ::= <natural>\texttt{/}<natural>
+
+<amount> ::= <count> <unit>
+
+<action> ::= <upper> (<lower> \texttt{\"}(<lower> )+\texttt{\"})
+
+<action-decl> ::= <all-upper> \texttt{=} <action>
+
+<unit> ::= <lower>
+
+<unit-decl> ::= <count> <lower> \texttt{=} <count> <unit>
+
+<all-upper> ::= [A-Z][A-Z]+
+
+<upper> ::= [A-Z][a-z]+
+
+<lower> ::= [a-z][a-z]+
+
+<natural> ::= [1-9][0-9]*
+
+\end{grammar}
+
+\end{document}
+
+

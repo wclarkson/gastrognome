@@ -7,6 +7,7 @@ import Examples.OldFashioned
 import Examples.Cookies
 
 import Test.HUnit
+import Test.HUnit.Diff
 import Text.Parsec.Error
 
 
@@ -21,20 +22,20 @@ tests = TestList[ TestLabel "waffles"       waffles_test
                 , TestLabel "cookies"       cookies_test
                 ]
 
-mkTestCase s expected seen = TestCase(assertEqual s expected seen)
+mkTestCase expected seen = TestCase(expected @==? seen)
 
 --Test for Waffles recipe
 waffles_result  = parse parseProgram "" wafflesText
 waffles_expects = Right wafflesAST
-waffles_test    = mkTestCase "waffles" waffles_expects waffles_result
+waffles_test    = mkTestCase waffles_expects waffles_result
 
 --Test for OldFashioned recipe
 oldFashioned_result  = parse parseProgram "" oldFashionedText
 oldFashioned_expects = Right oldFashionedAST
-oldFashioned_test    = mkTestCase "oldFashioned" oldFashioned_expects oldFashioned_result
+oldFashioned_test    = mkTestCase oldFashioned_expects oldFashioned_result
 
 --Test for Cookies recipe
 cookies_result  = parse parseProgram "" cookiesText
 cookies_expects = Right cookiesAST
-cookies_test    = mkTestCase "cookies" cookies_expects cookies_result
+cookies_test    = mkTestCase cookies_expects cookies_result
 

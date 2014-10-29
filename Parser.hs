@@ -44,7 +44,6 @@ capWord :: Parser String
 capWord = do
   { first <- upper
   ; rest <- many1 lower
-  ; spaces
   ; return (first:rest)
   }
 
@@ -129,7 +128,11 @@ parseIngredientDecl =
   in with1Block IngredientDecl parseName parseIngredientExp
 
 parseIngredientLit :: Parser IngredientLit
-parseIngredientLit = (sepBy1 capWord spaces) >>= return . IngredientLit . unwords
+parseIngredientLit = do
+  { ws <- sepBy1 capWord $ many $ char ' '
+  ; spaces
+  ; return (IngredientLit (unwords ws))
+  }
 
 parseDefaultQuantityDecl :: Parser DefaultQuantityDecl
 parseDefaultQuantityDecl = do

@@ -7,7 +7,7 @@ import Data.Ratio
 
 cookiesText =
   unlines [
-    "2 1/4 cups Flour",
+    "9/4 cups Flour",
     "1 tsp Baking Soda",
     "1 tsp Salt",
     "1 cup Butter",
@@ -46,11 +46,20 @@ cookiesText =
     "Cookies:",
     "  COOL for \"2 min\"",
     "    BAKE for \"9-11 min\" in \"Prepared Oven\"",
-    "      SEPARATE by 1 tbsp",
+    "      SEPARATE by \"1 tbsp\"",
     "        Cookie Dough"
   ]
 
 cookiesAST = Program [
+  PDefaultQuantityDecl flourDefault,
+  PDefaultQuantityDecl bakingSodaDefault,
+  PDefaultQuantityDecl saltDefault,
+  PDefaultQuantityDecl butterDefault,
+  PDefaultQuantityDecl granulatedSugarDefault,
+  PDefaultQuantityDecl brownSugarDefault,
+  PDefaultQuantityDecl vanillaExtractDefault,
+  PDefaultQuantityDecl eggsDefault,
+  PDefaultQuantityDecl chocolateChipsDefault,
   PIngredientDecl preparedOven,
   PIngredientDecl dryIngredients,
   PIngredientDecl wetIngredients,
@@ -58,33 +67,45 @@ cookiesAST = Program [
   PIngredientDecl cookies
   ]
 
-flour = IngredientQuantity
+flour           = IngredientName $ IngredientLit "Flour"
+bakingSoda      = IngredientName $ IngredientLit "Baking Soda"
+salt            = IngredientName $ IngredientLit "Salt"
+butter          = IngredientName $ IngredientLit "Butter"
+granulatedSugar = IngredientName $ IngredientLit "Granulated Sugar"
+brownSugar      = IngredientName $ IngredientLit "Brown Sugar"
+vanillaExtract  = IngredientName $ IngredientLit "Vanilla Extract"
+eggs            = IngredientName $ IngredientLit "Egg"
+chocolateChips  = IngredientName $ IngredientLit "Chocolate Chips"
+
+flourDefault = DefaultQuantityDecl
           (Amount (2 + 1%4) (Unit "cups"))
           (IngredientLit "Flour")
-bakingSoda = IngredientQuantity
+bakingSodaDefault = DefaultQuantityDecl
           (Amount 1 (Unit "tsp"))
           (IngredientLit "Baking Soda")
-salt = IngredientQuantity
+saltDefault = DefaultQuantityDecl
           (Amount 1 (Unit "tsp"))
           (IngredientLit "Salt")
-butter = IngredientQuantity
+butterDefault = DefaultQuantityDecl
           (Amount 1 (Unit "cup"))
           (IngredientLit "Butter")
-granulatedSugar = IngredientQuantity
+granulatedSugarDefault = DefaultQuantityDecl
           (Amount (3%4) (Unit "cup"))
           (IngredientLit "Granulated Sugar")
-brownSugar = IngredientQuantity
+brownSugarDefault = DefaultQuantityDecl
           (Amount (3%4) (Unit "cup"))
           (IngredientLit "Brown Sugar")
-vanillaExtract = IngredientQuantity
+vanillaExtractDefault = DefaultQuantityDecl
           (Amount 1 (Unit "tsp"))
           (IngredientLit "Vanilla Extract")
-eggs = IngredientQuantity
+eggsDefault = DefaultQuantityDecl
           (Count 2)
           (IngredientLit "Egg")
-chocolateChips = IngredientQuantity
+chocolateChipsDefault = DefaultQuantityDecl
           (Amount 2 (Unit "cups"))
           (IngredientLit "Chocolate Chips")
+
+
 
 
 preparedOven =
@@ -120,9 +141,6 @@ wetIngredients =
       ])
 
 cookieDough =
-  let IngredientDecl _ wet = wetIngredients
-      IngredientDecl _ dry = dryIngredients
-  in
   IngredientDecl (IngredientLit "Cookie Dough")
     (IngredientAction
       (Action "STIR" [])
@@ -130,21 +148,20 @@ cookieDough =
         (IngredientAction
           (Action "BEAT" [])
           [
-            wet,
-            dry
+            IngredientName $ IngredientLit "Wet Ingredients",
+            IngredientName $ IngredientLit "Dry Ingredients"
           ]),
           chocolateChips
       ])
 
 cookies =
-  let IngredientDecl _ dough = cookieDough in
   IngredientDecl (IngredientLit "Cookies")
     (IngredientAction
-      (Action "Cool" [("for", "2 min")])
+      (Action "COOL" [("for", "2 min")])
       [
         (IngredientAction
-          (Action "BAKE" [("for", "9-11 min"), ("in", "preparedOven")])
+          (Action "BAKE" [("for", "9-11 min"), ("in", "Prepared Oven")])
           [
             (IngredientAction
               (Action "SEPARATE" [("by", "1 tbsp")])
-              [dough])])])
+              [IngredientName $ IngredientLit "Cookie Dough"])])])

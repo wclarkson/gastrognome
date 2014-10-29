@@ -8,7 +8,7 @@ import Data.Ratio
 oldFashionedText = 
   unlines [
     "1 shot = 2 floz",
-    "1 dash = 1/32 oz",
+    "1 dash = 1/32 floz",
     "1 splash = 4 dash",
     "",
     "Flavor Mix:",
@@ -45,13 +45,13 @@ water = IngredientQuantity (Amount 1 (Unit "splash")) (IngredientLit "Water")
 bitters = IngredientQuantity
             (Amount 2 (Unit "dash"))
             (IngredientLit "Angostura Bitters")
-cherry = IngredientQuantity (Count 1) (IngredientLit "Cherry")
+cherry = IngredientQuantity (Count 1) (IngredientLit "Maraschino Cherry")
 orange = IngredientQuantity (Count 1) (IngredientLit "Orange Wedge")
 
 flavorMix =
   IngredientDecl (IngredientLit "Flavor Mix")
       (IngredientAction
-        (Action "MUDDLE" [])
+        (Action "MUDDLE" [("until", "paste")])
         [
           IngredientAction
             (Action "MIX" [])
@@ -70,9 +70,9 @@ iceCubes = IngredientQuantity (Count 1) (IngredientLit "Ice Cube")
 oldFashioned =
   IngredientDecl (IngredientLit "Old Fashioned")
     (IngredientAction
-          (Action "STIR" [])
+          (Action "STIR" [("in", "old-fashioned glass")])
           [
-            iceCubes,
+            IngredientName $ IngredientLit "Ice Cubes",
             IngredientAction
               (Action "POUR" [])
               [ bourbon, IngredientName (IngredientLit "Flavor Mix") ]

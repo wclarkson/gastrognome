@@ -1,26 +1,53 @@
 module Syntax where
 import Data.Ratio
 
+{-
+  Abstract Syntax Datatypes
+-}
+
+data Program        = Program [ProgramDecl]
+
+data ProgramDecl    = PIngredientDecl IngredientDecl
+                    | PDefaultQuantityDecl DefaultQuantityDecl
+                    | PActionDecl ActionDecl
+                    | PUnitDecl UnitDecl
+
+-- Ingredients
 data IngredientDecl = IngredientDecl String IngredientExp
 data IngredientExp  = IngredientQuantity Quantity IngredientLit
                     | IngredientName IngredientLit
                     | IngredientAction Action [IngredientExp]
 data IngredientLit  = IngredientLit String
 
+-- Quantities
 data DefaultQuantityDecl = DefaultQuantityDecl Quantity IngredientLit
-                         deriving Show
-
-data Action     = Action String [(String, String)]
-data ActionDecl = ActionDecl String Action
-
 data Quantity = Count (Ratio Integer)
               | Amount (Ratio Integer) Unit
+
+-- Actions
+data Action     = Action String [(String, String)]
+data ActionDecl = ActionDecl String Action
               
+-- Units
 data Unit     = Unit String
 data UnitDecl = UnitDecl (Ratio Integer) String (Ratio Integer) Unit
 
+
+{-
+  Abstract Syntax Show Instances
+-}
+
 indent :: [String] -> [String]
 indent ls = map ("\t"++) ls
+
+instance Show Program where
+  show (Program decls) = unlines $ map show decls
+
+instance Show ProgramDecl where
+  show (PIngredientDecl d) = show d
+  show (PDefaultQuantityDecl d) = show d
+  show (PActionDecl d) = show d
+  show (PUnitDecl d) = show d
 
 instance Show IngredientDecl where
   show (IngredientDecl name exp) =
@@ -35,14 +62,6 @@ instance Show IngredientExp where
 instance Show IngredientLit where
   show (IngredientLit lit) = lit
 
-instance Show Action where
-  show (Action verb adverbs) =
-    let showAdverb (conn, adv) = unwords [conn, "\"" ++ adv ++ "\""]
-    in unwords (verb : map showAdverb adverbs)
-
-instance Show ActionDecl where
-  show (ActionDecl name action) = unwords [name, "=", show action]
-
 showRatio :: (Integral a, Show a) => Ratio a -> String
 showRatio r = 
   let num = numerator r
@@ -51,9 +70,22 @@ showRatio r =
                    then ""
                    else "/" ++ show den
 
+instance Show DefaultQuantityDecl where
+  show (DefaultQuantityDecl quantity ingredient) =
+    unwords [show quantity, show ingredient]
+
 instance Show Quantity where
   show (Count r) = showRatio r
   show (Amount r unit) = unwords [showRatio r, show unit]
+
+instance Show Action where
+  show (Action verb adverbs) =
+    let showAdverb (conn, adv) = unwords [conn, "\"" ++ adv ++ "\""]
+    in unwords (verb : map showAdverb adverbs)
+
+instance Show ActionDecl where
+  show (ActionDecl name action) = unwords [name, "=", show action]
+
 
 instance Show Unit where
   show (Unit unit) = unit
@@ -61,4 +93,3 @@ instance Show Unit where
 instance Show UnitDecl where
   show (UnitDecl rLeft name rRight unit) =
     unwords [showRatio rLeft, name, "=", showRatio rRight, show unit]
-

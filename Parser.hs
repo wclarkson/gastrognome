@@ -1,5 +1,7 @@
 module Parser where
 
+import Syntax
+
 import Data.Ratio
 import Text.Parsec hiding (State, Parser, parse)
 import Text.Parsec.Prim (ParsecT, runParserT)
@@ -9,7 +11,6 @@ import Control.Monad.State
 import Text.Parsec.Token
 import Text.Parsec.String ()
 
-import Syntax
 
 type Parser a = ParsecT String () (State SourcePos) a
 
@@ -43,7 +44,6 @@ capWord :: Parser String
 capWord = do
   { first <- upper
   ; rest <- many1 lower
-  ; spaces
   ; return (first:rest)
   }
 
@@ -73,8 +73,8 @@ fraction = do
   Program parser
 -}
 
-programParser :: Parser Program
-programParser =
+parseProgram :: Parser Program
+parseProgram =
   let parseDecl    = try (parseIngredientDecl >>= return . PIngredientDecl) <|>
                      try (parseDefaultQuantityDecl >>=
                        return . PDefaultQuantityDecl) <|>
@@ -128,7 +128,11 @@ parseIngredientDecl =
   in with1Block IngredientDecl parseName parseIngredientExp
 
 parseIngredientLit :: Parser IngredientLit
-parseIngredientLit = (sepBy1 capWord spaces) >>= return . IngredientLit . unwords
+parseIngredientLit = do
+  { ws <- sepBy1 capWord $ many $ char ' '
+  ; spaces
+  ; return (IngredientLit (unwords ws))
+  }
 
 parseDefaultQuantityDecl :: Parser DefaultQuantityDecl
 parseDefaultQuantityDecl = do

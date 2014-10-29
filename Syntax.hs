@@ -15,7 +15,6 @@ data ProgramDecl    = PIngredientDecl IngredientDecl
 
 -- Ingredients
 data IngredientDecl = IngredientDecl IngredientLit IngredientExp deriving Eq
-data IngredientDecl = IngredientDecl IngredientLit IngredientExp
 data IngredientExp  = IngredientQuantity Quantity IngredientLit
                     | IngredientName IngredientLit
                     | IngredientAction Action [IngredientExp]

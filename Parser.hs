@@ -16,14 +16,6 @@ type Parser a = ParsecT String () (State SourcePos) a
 parse :: Parser a -> SourceName -> String -> Either ParseError a
 parse p source input = runIndent source $ runParserT p () source input
 
-mix = unlines [
-    "BEAT with \"whisk\" until \"smooth\"",
-    " Egg",
-    " MIX",
-    "  Flour",
-    "  Sugar"
-  ]
-
 many2 p = liftM2 (:) p (many1 p)
 
 parseNatural :: Parser Integer
@@ -31,28 +23,6 @@ parseNatural = do
   { d  <- oneOf "123456789"
   ; ds <- many digit
   ; return (read (d:ds))
-  }
-
-parseLabel :: Parser String
-parseLabel = do
-  { label <- many1 upper
-  ; spaces
-  ; return label
-  }
-
-parseItem :: Parser String
-parseItem = do
-  { item <- capWord
-  ; spaces
-  ; return item
-  }
-
-parseList :: Parser IngredientExp
-parseList = do
-  {
-  ; b <- withBlock IngredientAction parseAction parseIngredientName
-  ; spaces
-  ; return b
   }
 
 word :: Parser String
@@ -99,6 +69,23 @@ fraction = do
   denominator <- parseNatural
   return (numerator % denominator)
 
+{-
+  Program parser
+-}
+
+programParser :: Parser Program
+programParser =
+  let parseDecl    = try (parseIngredientDecl >>= return . PIngredientDecl) <|>
+                     try (parseDefaultQuantityDecl >>=
+                       return . PDefaultQuantityDecl) <|>
+                     try (parseActionDecl >>= return . PActionDecl) <|>
+                     (parseUnitDecl >>= return . PUnitDecl)
+  in sepBy1 parseDecl spaces >>= return . Program
+
+{-
+  Ingredients parsers
+-}
+
 parseIngredientQuantity :: Parser IngredientExp
 parseIngredientQuantity = do
   { quantity <- parseQuantity
@@ -118,6 +105,32 @@ parseIngredientExp =
   (try parseIngredientQuantity) <|>
   (try parseIngredientAction) <|>
   parseIngredientName
+
+declTest = unlines [
+    "Cat:",
+    " Dog"
+  ]
+
+-- Works like withBlock, but only allows a single indented parse of p
+with1Block f a p = withPos $ do
+  { r1 <- a
+  ; r2 <- option [] (indented >> block p)
+  ; (case r2 of [r] -> return (f r1 r)
+                _  -> parserFail $ unwords [
+                                      "multiple expressions after an",
+                                      "ingredient declaration"
+                                    ])
+  }
+
+parseIngredientDecl :: Parser IngredientDecl
+parseIngredientDecl =
+  let parseName = do
+        { name <- capWord
+        ; char ':'
+        ; spaces
+        ; return name
+        }
+  in with1Block IngredientDecl parseName parseIngredientExp
 
 parseIngredientLit :: Parser IngredientLit
 parseIngredientLit = capWord >>= return . IngredientLit
@@ -190,6 +203,8 @@ parseUnitDecl = do
   ; char '='
   ; spaces
   ; Count rightQ  <- parseCount
+  ; spaces
   ; exUnit  <- parseUnit
   ; return (UnitDecl leftQ newUnit rightQ exUnit)
   }
+

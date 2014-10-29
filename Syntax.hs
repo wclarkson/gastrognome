@@ -5,7 +5,7 @@ data IngredientDecl = IngredientDecl String IngredientExp
 data IngredientExp  = IngredientQuantity Quantity IngredientLit
                     | IngredientName IngredientLit
                     | IngredientAction Action [IngredientExp]
-data IngredientLit  = IngredientLit String
+data IngredientLit  = IngredientLit String deriving Eq
 
 data DefaultQuantityDecl = DefaultQuantityDecl Quantity IngredientLit
                          deriving Show

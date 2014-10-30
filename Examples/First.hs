@@ -6,7 +6,7 @@ import Examples.Waffles
 import Examples.OldFashioned
 import Examples.Cookies
 
-import Test.HUnit
+import Test.HUnit hiding (test)
 import Test.HUnit.Diff
 import Text.Parsec.Error
 

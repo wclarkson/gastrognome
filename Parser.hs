@@ -14,8 +14,10 @@ import Text.Parsec.String ()
 
 type Parser a = ParsecT String () (State SourcePos) a
 
-parse :: Parser a -> SourceName -> String -> Either ParseError a
-parse p source input = runIndent source $ runParserT p () source input
+parse :: Parser a -> SourcePos -> String -> Either ParseError a
+parse p pos input =
+  let name = sourceName pos
+  in runIndent name $ runParserT (setPosition pos >> p) () name input
 
 many2 p = liftM2 (:) p (many1 p)
 
@@ -80,7 +82,7 @@ parseProgram =
                        return . PDefaultQuantityDecl) <|>
                      try (parseActionDecl >>= return . PActionDecl) <|>
                      (parseUnitDecl >>= return . PUnitDecl)
-  in sepBy1 parseDecl spaces >>= return . Program
+  in spaces >> sepBy1 parseDecl spaces >>= return . Program
 
 {-
   Ingredients parsers

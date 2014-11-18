@@ -9,6 +9,7 @@ import Examples.Cookies
 import Test.HUnit
 import Test.HUnit.Diff
 import Text.Parsec.Error
+import Text.Parsec.Pos (SourcePos, initialPos)
 
 
 instance Eq ParseError where
@@ -24,18 +25,21 @@ tests = TestList[ TestLabel "waffles"       waffles_test
 
 mkTestCase expected seen = TestCase(expected @==? seen)
 
+emptyPos :: SourcePos
+emptyPos = initialPos ""
+
 --Test for Waffles recipe
-waffles_result  = parse parseProgram "" wafflesText
+waffles_result  = parse parseProgram emptyPos wafflesText
 waffles_expects = Right wafflesAST
 waffles_test    = mkTestCase waffles_expects waffles_result
 
 --Test for OldFashioned recipe
-oldFashioned_result  = parse parseProgram "" oldFashionedText
+oldFashioned_result  = parse parseProgram emptyPos oldFashionedText
 oldFashioned_expects = Right oldFashionedAST
 oldFashioned_test    = mkTestCase oldFashioned_expects oldFashioned_result
 
 --Test for Cookies recipe
-cookies_result  = parse parseProgram "" cookiesText
+cookies_result  = parse parseProgram emptyPos cookiesText
 cookies_expects = Right cookiesAST
 cookies_test    = mkTestCase cookies_expects cookies_result
 

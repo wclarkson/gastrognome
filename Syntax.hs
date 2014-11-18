@@ -1,5 +1,10 @@
+{-# LANGUAGE TemplateHaskell #-}
+
 module Syntax where
 import Data.Ratio
+
+import Language.Haskell.TH
+import Language.Haskell.TH.Lift
 
 {-
   Abstract Syntax Datatypes
@@ -96,3 +101,32 @@ instance Show Unit where
 instance Show UnitDecl where
   show (UnitDecl rLeft name rRight unit) =
     unwords [showRatio rLeft, name, "=", showRatio rRight, show unit]
+
+{-
+  Abstract Syntax Show Instances
+-}
+$(deriveLift ''IngredientExp)
+$(deriveLift ''IngredientLit)
+$(deriveLift ''Quantity)
+$(deriveLift ''Action)
+$(deriveLift ''Unit)
+
+{-
+  Quantity Num Instance
+-}
+instance Num Quantity where
+  (+) (Count r1) (Count r2)         = Count (r1+r2)
+  (+) (Amount r1 u1) (Amount r2 u2) =
+    if (u1 == u2)
+      then Amount (r1+r2) u1
+      else undefined
+  (+) _ _                           = undefined
+  (*) (Count r1) (Count r2)    = Count (r1*r2)
+  (*) (Count r1) (Amount r2 u) = Amount (r1*r2) u
+  (*) (Amount r1 u) (Count r2) = Amount (r1*r2) u
+  (*) _ _                      = undefined
+  abs q = q
+  signum q = Count 1
+  negate q = undefined
+  fromInteger i = Count (i%1)
+

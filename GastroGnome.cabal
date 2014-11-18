@@ -40,7 +40,8 @@ build-type:          Simple
 
 -- Extra files to be distributed with the package, such as examples or a 
 -- README.
--- extra-source-files:  
+extra-source-files:   Examples/First.hs,   Examples/Cookies.hs
+                      Examples/Waffles.hs, Examples/OldFashioned.hs
 
 -- Constraint on the version of Cabal needed to build this package.
 cabal-version:       >=1.10
@@ -48,7 +49,8 @@ cabal-version:       >=1.10
 
 library
   -- Modules exported by the library.
-  exposed-modules:     Parser, Syntax, Quote, CodeGen, Examples.Cookies, Examples.First, Examples.OldFashioned, Examples.Waffles
+  exposed-modules:  Language.GastroGnome.Parser,  Language.GastroGnome.Syntax,
+                    Language.GastroGnome.Quote,   Language.GastroGnome.CodeGen
   
   -- Modules included in this library but not exported.
   -- other-modules:       
@@ -57,7 +59,11 @@ library
   -- other-extensions:    
   
   -- Other library packages from which modules are imported.
-  build-depends:       base >=4.7 && <4.8, parsec >=3.1 && <3.2, template-haskell >=2.9 && <3.0, indents >=0.3 && <0.4, mtl >=2.2 && <2.3, HUnit >=1.2 && <1.3, HUnit-Diff >=0.1, th-lift ==0.6.1
+  build-depends:  base >=4.7 && <4.8,             parsec >=3.1 && <3.2,
+                  template-haskell >=2.9 && <3.0, indents >=0.3 && <0.4,
+                  mtl >=2.2 && <2.3,              HUnit >=1.2 && <1.3,
+                  HUnit-Diff >=0.1,               th-lift ==0.6.1,
+                  containers >=0.5
   
   -- Directories containing source files.
   -- hs-source-dirs:      

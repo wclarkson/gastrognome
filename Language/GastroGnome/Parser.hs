@@ -1,13 +1,13 @@
-module Parser where
+module Language.GastroGnome.Parser where
 
-import Syntax
+import Language.GastroGnome.Syntax
 
+import Control.Monad.State
 import Data.Ratio
 import Text.Parsec hiding (State, Parser, parse)
 import Text.Parsec.Prim (ParsecT, runParserT)
 import Text.Parsec.Pos (SourcePos)
 import Text.Parsec.Indent
-import Control.Monad.State
 import Text.Parsec.Token
 import Text.Parsec.String ()
 

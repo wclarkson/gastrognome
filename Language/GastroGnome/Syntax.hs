@@ -1,6 +1,6 @@
 {-# LANGUAGE TemplateHaskell #-}
 
-module Syntax where
+module Language.GastroGnome.Syntax where
 import Data.Ratio
 
 import Language.Haskell.TH

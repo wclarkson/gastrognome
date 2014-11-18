@@ -1,8 +1,9 @@
 {-# LANGUAGE TemplateHaskell #-}
 
-module CodeGen where
+module Language.GastroGnome.CodeGen where
 
-import Syntax
+import Language.GastroGnome.Syntax
+import Language.GastroGnome.Util
 
 import Language.Haskell.TH
 
@@ -14,10 +15,6 @@ import Data.Maybe
 
 import Debug.Trace
 
-{-
-normalizeUnits :: Quantity -> Quantity
--}
-
 -- The environment in which a recipe is interpreted, i.e., the kitchen
 data Kitchen = Kitchen { ingredientEnv :: Map.Map String IngredientExp
                        , actionEnv :: Map.Map String Action
@@ -27,24 +24,16 @@ data Kitchen = Kitchen { ingredientEnv :: Map.Map String IngredientExp
 emptyKitchen :: Kitchen
 emptyKitchen = Kitchen Map.empty Map.empty Map.empty
 
-
-multIngredientExp :: Quantity -> IngredientExp -> IngredientExp
-multIngredientExp q1 (IngredientQuantity q2 lit) =
-  IngredientQuantity (q1*q2) lit
-multIngredientExp q name@(IngredientName _) = name
-multIngredientExp q (IngredientAction a es) =
-  IngredientAction a (map (multIngredientExp q) es)
-
 mkSubst :: Kitchen -> IngredientExp -> IngredientExp
 mkSubst (Kitchen ie _ qe) name@(IngredientName (IngredientLit lit)) =
   case (Map.lookup lit ie, Map.lookup lit qe)
-    of (Just e, Just q)    -> multIngredientExp q e
+    of (Just e, Just q)    -> q # e
        (Just e, Nothing)   -> e
        (Nothing, Just q) -> IngredientQuantity q (IngredientLit lit)
        _                   -> name
 mkSubst (Kitchen ie _ _) quantity@(IngredientQuantity q (IngredientLit lit)) =
   case Map.lookup lit ie
-    of Just exp -> multIngredientExp q exp
+    of Just exp -> q # exp
        Nothing  -> quantity
 mkSubst k@(Kitchen _ ae _) (IngredientAction a@(Action verb adverbs) exps) =
   let exps'     = map (mkSubst k) exps
@@ -54,13 +43,10 @@ mkSubst k@(Kitchen _ ae _) (IngredientAction a@(Action verb adverbs) exps) =
              Nothing                      -> a
   in IngredientAction newAction exps'
 
-
-addKey :: (String, a) -> (Map.Map String a) -> Map.Map String a
-addKey (k,v) m = Map.insert k v m
-
 genBindings :: [ProgramDecl] -> Kitchen -> Kitchen
 genBindings (d:ds) k@(Kitchen ie ae qe) =
-  let subst = mkSubst k
+  let addKey (k,v) m = Map.insert k v m
+      subst = mkSubst k
       getIngredient (IngredientDecl (IngredientLit name) exp) =
         (name, subst exp)
       getAction (ActionDecl name action) = (name, action)

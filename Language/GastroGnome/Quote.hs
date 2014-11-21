@@ -9,6 +9,7 @@ import Text.Parsec.Pos
 import Language.GastroGnome.CodeGen
 import Language.GastroGnome.Parser
 import Language.GastroGnome.Syntax (IngredientExp(..), IngredientLit(..))
+import Language.GastroGnome.Util
 
 gastrognome :: QuasiQuoter
 gastrognome = QuasiQuoter parseExp

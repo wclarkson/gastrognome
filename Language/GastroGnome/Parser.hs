@@ -1,6 +1,11 @@
+{-# LANGUAGE TemplateHaskell #-}
+
 module Language.GastroGnome.Parser where
 
 import Language.GastroGnome.Syntax
+
+import Language.Haskell.Meta as Meta
+import Language.Haskell.TH as TH
 
 import Control.Monad.State
 import Data.Ratio
@@ -102,11 +107,30 @@ parseIngredientName = parseIngredientLit >>= return . IngredientName
 parseIngredientAction :: Parser IngredientExp
 parseIngredientAction = withBlock IngredientAction parseAction parseIngredientExp
 
+parseHaskellExp :: String -> Parser TH.Exp
+parseHaskellExp input =
+  case Meta.parseExp input of
+    Left err  -> parserZero
+    Right exp -> return exp
+
+{-
+parseIngredientAntiQuote :: Parser IngredientExp
+parseIngredientAntiQuote = do
+  { string "<|"
+  ; spaces
+  ; haskellExp <- parseHaskellExp
+  ; spaces
+  ; string "|>"
+  ; return 
+  }
+  -}
+
 parseIngredientExp :: Parser IngredientExp
 parseIngredientExp =
   (try parseIngredientQuantity) <|>
   (try parseIngredientAction) <|>
-  parseIngredientName
+  (try parseIngredientName) <|>
+  (spaces >> parseIngredientExp)
 
 -- Works like withBlock, but only allows a single indented parse of p
 with1Block f a p = withPos $ do

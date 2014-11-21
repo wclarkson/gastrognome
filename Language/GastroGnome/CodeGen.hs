@@ -104,6 +104,7 @@ makeGastroGnomeDecls p =
       d = makeIngredientDecls r
   in d
 
-
+makeGastroGnomeExp :: IngredientExp -> Q Exp
+makeGastroGnomeExp ie = [| ie |]
 
 

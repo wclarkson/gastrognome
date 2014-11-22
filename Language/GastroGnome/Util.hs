@@ -19,12 +19,3 @@ extractIngrdientList exp =
   in extractIngrdientList exp []
 -}
 
-{-
-              BAKE
-              /  \
-             /    \
-           MIX    Egg
-           /\
-          /  \
-      Flour  Water
--}

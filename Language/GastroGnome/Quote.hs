@@ -2,7 +2,7 @@ module Language.GastroGnome.Quote (gastrognome, IngredientExp(..), IngredientLit
 
 import System.IO.Unsafe (unsafePerformIO) 
 import qualified Language.Haskell.TH as TH
-import Language.Haskell.TH.Quote (QuasiQuoter(..))
+import Language.Haskell.TH.Quote (QuasiQuoter(..), quoteFile)
 
 import Text.Parsec.Pos
 
@@ -16,6 +16,8 @@ gastrognome = QuasiQuoter parseExp
                           (error "parse pattern")
                           (error "parse type")
                           parseDecl
+
+gastronomeFile = quoteFile gastrognome
 
 parseAny :: String -> Parser a -> (a -> TH.Q b) -> TH.Q b
 parseAny input p gen = do

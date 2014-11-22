@@ -2,6 +2,8 @@
 
 module Tools.KitchenAssistant where
 
+import Data.List
+
 import Language.GastroGnome.Quote
 import Language.GastroGnome.Syntax
 
@@ -29,34 +31,38 @@ getTime (Action _ adverbs) =
       findTime []               = "0 s"
   in parseTime $ findTime adverbs
 
-{-
-genTL :: IngredientExp -> [(Time, Action, String)]
-genTL exp =
-  let genTLRec :: Time -> IngredientExp -> ([(Time, Action, String)], Time)
-      genTLRec start (IngredientAction action ies) =
-        let f (IngredientAction a kids) (list, time) =
-              let children = map (genTLRec time) kids
-              in ((time, a, show a):(children++list), addTime time (getTime a))
-            f _ tup = tup
-        in foldr f ([], start) ies
-      genTLRec start                         _     = ([], start)
-      (list, _) = genTLRec 0 exp
-  in list
-  -}
-
 type TLEntry = (Time, Action, String)
+
+showTLEntry :: TLEntry -> String
+showTLEntry (t, a, s) = unwords [show a, show s]
+
+genIngredientName :: [IngredientExp] -> String
+genIngredientName exps =
+  let f q@(IngredientQuantity _ _) = [show q]
+      f (IngredientName (IngredientLit name))       = [name]
+      f (IngredientAction _ exps)                   = concatMap f exps
+  in intercalate ", " $ concatMap f exps
 
 genTimeline :: IngredientExp -> [TLEntry]
 genTimeline exp =
   let genTL :: IngredientExp -> [TLEntry] -> [TLEntry]
       genTL (IngredientAction action exps) list =
-        foldr genTL ((Seconds 0, action, ""):list) exps
+        foldr genTL ((Seconds 0, action, genIngredientName exps):list) exps
       genTL _                                 x = x
       updateTime :: (Time, [TLEntry]) -> TLEntry -> (Time, [TLEntry])
       updateTime (start, list) (_, a, s) =
         (addTime start (getTime a), (start, a, s):list)
       (_,list) = foldl updateTime (Seconds 0, []) $ genTL exp []
   in reverse list
+
+kitchenAssistant :: IngredientExp -> IO ()
+kitchenAssistant exp = do
+  { putStrLn "Hit enter after completing the step."
+  ; let steps = genTimeline exp
+  ; let f (x:xs) = do { putStr $ showTLEntry x; getLine; f xs }
+        f []     = return ()
+  ; f steps
+  }
 
 [gastrognome|
   2 Egg

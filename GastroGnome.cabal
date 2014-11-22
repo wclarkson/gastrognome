@@ -52,6 +52,7 @@ library
   exposed-modules:  Language.GastroGnome.Parser,  Language.GastroGnome.Syntax,
                     Language.GastroGnome.Quote,   Language.GastroGnome.CodeGen,
                     Tools.KitchenAssistant
+                    Tools.ShoppingHelper
   
   -- Modules included in this library but not exported.
   -- other-modules:       

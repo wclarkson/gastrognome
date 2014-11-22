@@ -100,9 +100,10 @@ makeIngredientDecls decls =
 
 makeKitchenDecls :: Kitchen -> Q [Dec]
 makeKitchenDecls (Kitchen ie ae qe) =
-  let actionExps   = makeValDecl "actionBindings" [| ae |]
-      quantityExps = makeValDecl "quantityBindings" [| qe |]
-  in concatQ [actionExps, quantityExps]
+  let ingredientExps = makeValDecl "ingredientBindings" [| ie |]
+      actionExps     = makeValDecl "actionBindings" [| ae |]
+      quantityExps   = makeValDecl "quantityBindings" [| qe |]
+  in concatQ [ingredientExps, actionExps, quantityExps]
 
 makeGastroGnomeDecls :: Program -> Q [Dec]
 makeGastroGnomeDecls p = 

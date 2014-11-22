@@ -3,9 +3,11 @@
 module Tools.KitchenAssistant where
 
 import Data.List
+import qualified Data.Map.Strict as Map
 
 import Language.GastroGnome.Quote
 import Language.GastroGnome.Syntax
+import Language.GastroGnome.CodeGen (lowerName)
 
 data Time = Seconds Int deriving Show
 
@@ -65,20 +67,29 @@ kitchenAssistant exp = do
   }
 
 [gastrognome|
-  2 Egg
-  3 cup Flour
+1 shot = 2 floz
+1 dash = 1/32 floz
+1 splash = 4 dash
 
-  BAKE = SHAKE with "vigor"
+Flavor Mix:
+  MUDDLE until "paste"
+    MIX
+      1 tsp Sugar
+      1 splash Water
+      2 dash Angostura Bitters
+    1 Maraschino Cherry
+    1 Orange Wedge
 
-  Cookies:
-    BAKE for "10 s"
-      Egg
-      MIX for "4 s"
-        Flour
-        Water
-      SWIRL for "5 s"
-        Cat
+Old Fashioned:
+  STIR in "old-fashioned glass"
+    Ice Cubes
+    POUR
+      1 shot Bourbon
+      Flavor Mix
 |]
+
+main :: IO ()
+main = kitchenAssistant oldFashioned
 
 
 

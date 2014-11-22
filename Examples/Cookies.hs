@@ -1,6 +1,6 @@
 module Examples.Cookies where
 
-import Syntax
+import Language.GastroGnome.Syntax
 
 import Data.Ratio
 

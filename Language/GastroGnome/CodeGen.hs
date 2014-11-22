@@ -64,12 +64,12 @@ genBindings (d:ds) k@(Kitchen ie ae qe) =
   in genBindings ds k'
 genBindings [] k = k
 
-reifyRecipe :: Program -> [IngredientDecl]
+reifyRecipe :: Program -> ([IngredientDecl], Kitchen)
 reifyRecipe (Program decls) =
-  let (Kitchen ie ae qe) = genBindings decls emptyKitchen
+  let k@(Kitchen ie ae qe) = genBindings decls emptyKitchen
       mkIngredientDecl name ie ingDecls =
         (IngredientDecl (IngredientLit name) ie):ingDecls
-  in Map.foldrWithKey mkIngredientDecl [] ie
+  in (Map.foldrWithKey mkIngredientDecl [] ie, k)
 
 lowerName:: IngredientLit -> String
 lowerName (IngredientLit name) = 
@@ -98,10 +98,16 @@ makeIngredientDecls decls =
   let f (IngredientDecl lit exp) = makeValDecl (lowerName lit) [| exp |]
   in concatQ $ map f decls
 
+makeKitchenDecls :: Kitchen -> Q [Dec]
+makeKitchenDecls (Kitchen ie ae qe) =
+  let actionExps   = makeValDecl "actionBindings" [| ae |]
+      quantityExps = makeValDecl "quantityBindings" [| qe |]
+  in concatQ [actionExps, quantityExps]
+
 makeGastroGnomeDecls :: Program -> Q [Dec]
 makeGastroGnomeDecls p = 
-  let r = reifyRecipe p
-      d = makeIngredientDecls r
+  let (r,k) = reifyRecipe p
+      d     = concatQ [(makeIngredientDecls r), (makeKitchenDecls k)]
   in d
 
 makeGastroGnomeExp :: IngredientExp -> Q Exp

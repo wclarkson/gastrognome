@@ -1,7 +1,9 @@
 {-# LANGUAGE TemplateHaskell #-}
 
 module Language.GastroGnome.Syntax where
+
 import Data.Ratio
+import qualified Data.Map.Strict as Map
 
 import Language.Haskell.TH
 import Language.Haskell.TH.Lift
@@ -110,6 +112,7 @@ $(deriveLift ''IngredientLit)
 $(deriveLift ''Quantity)
 $(deriveLift ''Action)
 $(deriveLift ''Unit)
+$(deriveLift ''Map.Map)
 
 {-
   Quantity Num Instance

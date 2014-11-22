@@ -50,7 +50,8 @@ cabal-version:       >=1.10
 library
   -- Modules exported by the library.
   exposed-modules:  Language.GastroGnome.Parser,  Language.GastroGnome.Syntax,
-                    Language.GastroGnome.Quote,   Language.GastroGnome.CodeGen
+                    Language.GastroGnome.Quote,   Language.GastroGnome.CodeGen,
+                    Tools.KitchenAssistant
   
   -- Modules included in this library but not exported.
   -- other-modules:       

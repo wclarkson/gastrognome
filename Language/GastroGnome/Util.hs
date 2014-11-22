@@ -18,3 +18,13 @@ extractIngrdientList exp =
         concatMap extractIngrdientList exps
   in extractIngrdientList exp []
 -}
+
+{-
+              BAKE
+              /  \
+             /    \
+           MIX    Egg
+           /\
+          /  \
+      Flour  Water
+-}

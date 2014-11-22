@@ -4,7 +4,6 @@ module Language.GastroGnome.Parser where
 
 import Language.GastroGnome.Syntax
 
-import Language.Haskell.Meta as Meta
 import Language.Haskell.TH as TH
 
 import Control.Monad.State
@@ -107,13 +106,13 @@ parseIngredientName = parseIngredientLit >>= return . IngredientName
 parseIngredientAction :: Parser IngredientExp
 parseIngredientAction = withBlock IngredientAction parseAction parseIngredientExp
 
+{-
 parseHaskellExp :: String -> Parser TH.Exp
 parseHaskellExp input =
   case Meta.parseExp input of
     Left err  -> parserZero
     Right exp -> return exp
 
-{-
 parseIngredientAntiQuote :: Parser IngredientExp
 parseIngredientAntiQuote = do
   { string "<|"

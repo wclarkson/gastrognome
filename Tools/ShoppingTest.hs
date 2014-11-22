@@ -60,10 +60,19 @@ countDecl ratio name = DefaultQuantityDecl (Count ratio) (IngredientLit name)
 
 pantry :: [DefaultQuantityDecl]
 pantry = [ amntDecl (3%4) "cup" "Brown Sugar"
-         , amntDecl (1) "cup" "Butter"]
+         , amntDecl (2) "cup" "Butter"]
 
 needs :: [IngredientExp]
 needs = [cookies]
 
 whatDoINeed :: [DefaultQuantityDecl]
 whatDoINeed = makeShoppingList pantry needs
+
+printList :: [DefaultQuantityDecl] -> IO ()
+printList [] = return ()
+printList (l:ls) = do
+  putStrLn (show l)
+  printList ls
+
+test :: IO ()
+test = printList whatDoINeed

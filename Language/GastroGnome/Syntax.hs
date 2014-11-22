@@ -119,19 +119,19 @@ instance Num Quantity where
   (+) (Amount r1 u1) (Amount r2 u2) =
     if (u1 == u2)
       then Amount (r1+r2) u1
-      else undefined
-  (+) _ _                           = undefined
+      else error "unit mismatch in addition"
+  (+) _ _                           = error "can't add Count and Amount"
   (-) (Count r1) (Count r2)         = Count (r1-r2)
   (-) (Amount r1 u1) (Amount r2 u2) =
     if (u1 == u2)
       then Amount (r1-r2) u1
-      else undefined
+      else error "unit mismatch in subtraction"
   (-) (Amount r u) (Count 0)        = Amount r u
-  (-) _ _                           = undefined
+  (-) _ _                           = error "can't subtract Count and Amount"
   (*) (Count r1) (Count r2)    = Count (r1*r2)
   (*) (Count r1) (Amount r2 u) = Amount (r1*r2) u
   (*) (Amount r1 u) (Count r2) = Amount (r1*r2) u
-  (*) _ _                      = undefined
+  (*) _ _                      = error "can't multiply Count and Amount"
   abs q = q
   signum q = Count 1
   negate (Count r) = Count (negate r)

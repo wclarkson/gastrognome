@@ -35,7 +35,12 @@ declDiff have need =
         let DefaultQuantityDecl _ lit = n
             needed = (getQuant lit need) - (getQuant lit have)
         in case needed
-             of Count  0   -> diff ns list
-                Amount 0 _ -> diff ns list
-                _          -> diff ns ((DefaultQuantityDecl needed lit):list)
+             of Count  r   ->
+                  if r > 0
+                    then diff ns ((DefaultQuantityDecl needed lit):list)
+                    else diff ns list
+                Amount r _ ->
+                  if r > 0
+                    then diff ns ((DefaultQuantityDecl needed lit):list)
+                    else diff ns list
   in diff need []

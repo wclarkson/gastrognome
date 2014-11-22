@@ -1,6 +1,6 @@
 module Examples.OldFashioned where
 
-import Syntax
+import Language.GastroGnome.Syntax
 
 import Data.Ratio
 

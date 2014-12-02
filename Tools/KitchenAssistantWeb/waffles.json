@@ -1,0 +1,13 @@
+ {
+ "steps":
+ [
+{ "time":  0 , "action": " BEAT until \"fluffy\" ", "string": " 2 Egg ",
+"duration":  4 },
+
+{ "time":  0 , "action": " MIX ", "string": " 2 cup Flour, 1 tablespoon Sugar, 4 teaspoon Baking Powder, 1/4 tsp Salt ",  "duration":  0 },
+
+{ "time":  0 , "action": " BEAT until \"smooth\" in \"large bowl\" ", "string": " 2 Egg, 2 cup Flour, 1 tablespoon Sugar, 4 teaspoon Baking Powder, 1/4 tsp Salt, 7/4 cup Milk, 1/2 cup Vegetable Oil, 1/2 tsp Vanilla ",  "duration":  3 },
+
+{ "time":  0 , "action": " COOK at \"300 F\" in \"Prepared Waffle Iron\" until \"golden brown\" ", "string": " 2 Egg, 2 cup Flour, 1 tablespoon Sugar, 4 teaspoon Baking Powder, 1/4 tsp Salt, 7/4 cup Milk, 1/2 cup Vegetable Oil, 1/2 tsp Vanilla ",  "duration":  8 }
+]
+}

@@ -74,35 +74,48 @@ kitchenAssistant :: IngredientExp -> IO ()
 kitchenAssistant exp = do
   { putStrLn "Hit enter after completing the step."
   ; let steps = genTimeline exp
-  ; let f (x:xs) = do { putStrLn $ showTLEntry x; getLine; f xs }
+  ; let f (x:xs) = do { putStrLn $ showTLEntryJson x; getLine; f xs }
         f []     = return ()
   ; f steps
   }
 
 [gastrognome|
-1 shot = 2 floz
-1 dash = 1/32 floz
-1 splash = 4 dash
+2 Egg
+7/4 cup Milk
+1/2 cup Vegetable Oil
+1/2 tsp Vanilla
 
-Flavor Mix:
-  MUDDLE until "paste"
-    MIX
-      1 tsp Sugar
-      1 splash Water
-      2 dash Angostura Bitters
-    1 Maraschino Cherry
-    1 Orange Wedge
+INCORPORATE = BEAT until "smooth"
 
-Old Fashioned:
-  STIR in "old-fashioned glass"
-    Ice Cubes
-    POUR
-      1 shot Bourbon
-      Flavor Mix
+Dry Ingredients:
+  MIX
+    2 cup Flour
+    1 tablespoon Sugar
+    4 teaspoon Baking Powder
+    1/4 tsp Salt
+ 
+Batter:
+  INCORPORATE in "large bowl" 
+    BEAT until "fluffy"
+      Egg
+    Dry Ingredients
+    Milk
+    Vegetable Oil
+    Vanilla
+
+Prepared Waffle Iron:
+  SPRAY with "Cooking Spray"
+    PREHEAT for "15 min"
+      Waffle Iron
+ 
+Waffles:
+  COOK at "300 F" in "Prepared Waffle Iron"
+  until "golden brown"
+    Batter
 |]
 
 main :: IO ()
-main = kitchenAssistant oldFashioned
+main = kitchenAssistant waffles
 
 
 

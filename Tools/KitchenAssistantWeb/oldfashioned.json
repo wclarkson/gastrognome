@@ -1,0 +1,12 @@
+ {
+ "steps":
+ [
+{ "time":  0 , "action": " MIX ", "string": " 1 tsp Sugar, 1 splash Water, 2 dash Angostura Bitters ",  "duration":  2 },
+
+{ "time":  0 , "action": " MUDDLE until \"paste\" ", "string": " 1 tsp Sugar, 1 splash Water, 2 dash Angostura Bitters, 1 Maraschino Cherry, 1 Orange Wedge ", "duration":  3 },
+
+{ "time":  0 , "action": " POUR ", "string": " 1 shot Bourbon, 1 tsp Sugar, 1 splash Water, 2 dash Angostura Bitters, 1 Maraschino Cherry, 1 Orange Wedge ", "duration":  4 },
+
+{ "time":  0 , "action": " STIR in \"old-fashioned glass\" ", "string": " Ice Cubes, 1 shot Bourbon, 1 tsp Sugar, 1 splash Water, 2 dash Angostura Bitters, 1 Maraschino Cherry, 1 Orange Wedge ",  "duration":  0 }
+]
+}

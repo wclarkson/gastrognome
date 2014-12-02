@@ -1,0 +1,33 @@
+html {
+  background-color: #ddd;
+}
+
+body {
+  width: 600px;
+  background-color: white;
+  padding: 10px;
+  margin: 20px auto 20px auto;
+  border-radius: 10px;
+  text-align: center;
+}
+
+body img {
+  margin: 0 auto 20px auto;
+  display: block;
+}
+
+div#recipeContainer {
+  padding: 20px;
+}
+
+div#timerContainer {
+  padding: 10px;
+}
+
+div#nextStepTimer {
+  font-size: large;
+}
+
+button#nextStep {
+  display: none;
+}

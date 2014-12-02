@@ -38,6 +38,18 @@ type TLEntry = (Time, Action, String)
 showTLEntry :: TLEntry -> String
 showTLEntry (t, a, s) = unwords [show a, show s]
 
+showTLEntryJson :: TLEntry -> String
+showTLEntryJson (Seconds t, a, s) =
+  let (Seconds duration) = getTime a
+  in unwords [
+      "{",
+      "\"time\": ", show t, ",",
+      "\"action\": \"", show a, "\",",
+      "\"string\": \"", s, "\", ",
+      "\"duration\": ", show duration,
+      "}"
+    ]
+
 genIngredientName :: [IngredientExp] -> String
 genIngredientName exps =
   let f q@(IngredientQuantity _ _) = [show q]
@@ -57,11 +69,12 @@ genTimeline exp =
       (_,list) = foldl updateTime (Seconds 0, []) $ genTL exp []
   in reverse list
 
+-- use showTLEntryJson to output JSON for web tool
 kitchenAssistant :: IngredientExp -> IO ()
 kitchenAssistant exp = do
   { putStrLn "Hit enter after completing the step."
   ; let steps = genTimeline exp
-  ; let f (x:xs) = do { putStr $ showTLEntry x; getLine; f xs }
+  ; let f (x:xs) = do { putStrLn $ showTLEntry x; getLine; f xs }
         f []     = return ()
   ; f steps
   }

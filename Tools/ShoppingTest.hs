@@ -60,7 +60,8 @@ countDecl ratio name = DefaultQuantityDecl (Count ratio) (IngredientLit name)
 
 pantry :: [DefaultQuantityDecl]
 pantry = [ amntDecl (3%4) "cup" "Brown Sugar"
-         , amntDecl (2) "cup" "Butter"]
+         , amntDecl (2) "cup" "Butter"
+         , amntDecl (100) "lbs" "Gnome Kibbles"]
 
 needs :: [IngredientExp]
 needs = [cookies]

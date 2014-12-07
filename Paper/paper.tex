@@ -1,0 +1,274 @@
+%
+% LaTeX template for prepartion of submissions to PLDI'15
+%
+% Requires temporary version of sigplanconf style file provided on
+% PLDI'15 web site.
+% 
+\documentclass[pldi]{sigplanconf-pldi15}
+
+%
+% the following standard packages may be helpful, but are not required
+%
+\usepackage{SIunits}            % typset units correctly
+\usepackage{courier}            % standard fixed width font
+\usepackage[scaled]{helvet} % see www.ctan.org/get/macros/latex/required/psnfss/psnfss2e.pdf
+\usepackage{url}                  % format URLs
+\usepackage{listings}          % format code
+\usepackage{enumitem}      % adjust spacing in enums
+\usepackage[colorlinks=true,allcolors=blue,breaklinks,draft=false]{hyperref}   % hyperlinks, including DOIs and URLs in bibliography
+% known bug: http://tex.stackexchange.com/questions/1522/pdfendlink-ended-up-in-different-nesting-level-than-pdfstartlink
+\newcommand{\doi}[1]{doi:~\href{http://dx.doi.org/#1}{\Hurl{#1}}}   % print a hyperlinked DOI
+
+
+
+\begin{document}
+
+%
+% any author declaration will be ignored  when using 'plid' option (for double blind review)
+%
+
+\title{GastroGnome: A Language for Recipes}
+\authorinfo{William Clarkson}{}{william.clarkson@tufts.edu}
+\authorinfo{Andrew Mendelsohn}{}{andrew.mendelsohn@tufts.edu}
+
+\maketitle
+\begin{abstract}
+The majority of recipes are written in natural language, and there exists no
+simple, standardized, and unambiguous representation of recipes which lends
+itself to consumption by a computer program. With this in mind, we have
+developed a new programming language for the specification of recipes. Our
+primary goals to provide a readable and expressive language which can serve as
+a foundation for a myriad of future tools which perform computations over
+recipes.
+\end{abstract}
+
+\section{Introduction}
+Recent years have seen increased application of computational techniques to a
+variety of domains. Great advances have been made in fields such as
+computational biology. However, while some domains operate over
+well-structured data (e.g. genomic data), some do not lend themselves so
+readily to computation. We believe that the culinary arts is one such domain.
+A structured language for the unambiguous description of recipes would open
+the domain of cooking to the application of computational techniques for the
+analysis of recipes and the generation of useful artifacts based on such
+recipes. In Section \ref{sec:exampleusage}, we will discuss some tools that we
+have created to demonstrate the language’s promise as a foundation for
+interesting future computation over recipes.
+
+At a high level, we decided to create a language with a syntax that feels
+declarative, since recipes often contain no logic, and a more imperative
+structure would likely be less readable. We aimed to take cues from the
+functional paradigm, and represent recipes as repeated composition of
+increasingly complex parts, starting with atomic data.
+
+\section{Design}
+We settled on a simple syntax for the language, with a handful of declaration
+forms and expression forms, for which we provide some examples in Figure
+\ref{fig:expdec}. A named recipe is introduced with an ingredient declaration,
+and its right-hand side, so to speak, is composed of an ingredient, which can
+be a single atomic ingredient quantity expression, or an action which combines
+a list of ingredients. Quantity declarations enable the default quantity for
+an ingredient to be specified at top level so the names can later be referred
+to without a quantity, as is common practice for many cookbooks. Action
+declarations allow the user to define a new action in terms of another action
+in conjunction with adverbs to specify it more precisely. In natural language
+terms, our grammar for recipes consists of ways of introducing ingredients
+(nouns), and ways of combining ingredients (verbs with optional adverbs).
+
+While the compositionality of our language makes it reminiscent of Lisp
+S-expressions, we decided to use required indentation instead of matched
+delimiters like parentheses to structure our code, as we thought this would
+lead to a more readable program, and one which would be less daunting to a
+cook with minimal programming experience.
+
+Waffles example discussed here, seen in Figure \ref{fig:waffles}.
+
+\begin{figure}
+	
+	\caption{Examples of GastroGnome declaration and expression forms}
+	\label{fig:expdec}
+\end{figure}
+\fbox{
+	\begin{tabular}{ l l }
+		Ingredient Declaration & \tt Mixture: $\hookleftarrow$ 1 cup Water \\ 
+		Quantity Declaration & \tt 3 cup Flour \\
+		Action Declaration & \tt WHISK = STIR with "whisk" \\
+		Unit Declaration & \tt 1 gallon = 4 quart
+	\end{tabular}
+}
+
+\fbox{
+	\begin{tabular}{ l l }
+		Ingredient Quantity & \tt 3 cup Flour \rm or \tt 4 Egg \\
+		Name & \tt Flour \\
+		Action & \tt BLEND \rm or \tt MIX until "smooth" \\
+		Quantity & \tt 4 tsp \rm or \tt 2 \\
+		Unit & \tt cup \rm or \tt tbsp
+	\end{tabular}
+}
+
+\begin{figure}
+	\begin{verbatim}
+	2 Egg
+	7/4 cup Milk
+	1/2 cup Vegetable Oil
+	1/2 tsp Vanilla
+
+	INCORPORATE = BEAT until "smooth"
+
+	Dry Ingredients:
+	  MIX
+	    2 cup Flour
+	    1 tablespoon Sugar
+	    4 teaspoon Baking Powder
+	    1/4 tsp Salt
+ 
+	Batter:
+	  INCORPORATE in "large bowl" 
+	    BEAT until "fluffy"
+	      Egg
+	    Dry Ingredients
+	    Milk
+	    Vegetable Oil
+	    Vanilla
+
+	Prepared Waffle Iron:
+	  SPRAY with "Cooking Spray"
+	    PREHEAT for "15 min"
+	      Waffle Iron
+ 
+	Waffles:
+	  COOK at "300 F" in "Prepared Waffle Iron"
+	  until "golden brown"
+	    Batter	
+	\end{verbatim}
+	\caption{Recipe for waffles expressed in GastroGnome}
+	\label{fig:waffles}
+\end{figure}
+
+\section{Implementation}
+Our language is parsed using the Parsec parser combinator library, which
+enabled it to be implemented fairly straightforwardly and in an organized and
+readable manner which will allow it to be extended easily in the future if
+additional language constructs are added to the syntax.
+
+GastroGnome is embedded in Haskell using the quasiquoting facility provided by
+Template Haskell. We have implemented the declaration form, which allows a
+quasiquotation at top level which contains any number of top-level GastroGnome
+declarations. This is the primary manner in which a recipe or set of recipes
+are introduced. Additionally, we have implemented the expression form, which
+allows a single quoted ingredient expression to be introduced to Haskell. This
+enables some simplifying shorthand in the programmatic construction of recipes
+over manual use of the exposed data constructors for the GastroGnome
+representation of recipes.
+
+When GastroGnome syntax is quasiquoted in Haskell, it is parsed, using the
+appropriate parser for either full programs (list of GastroGnome declarations)
+or single ingredient expressions, into an algebraic data structure
+representing the abstract syntax. This then undergoes a process which we have
+termed “reification” due to it’s passing similarity to the similar process
+described in the Mainland quasiquoting paper ~\cite{mainland07quasiquoting}.
+The program is traversed, binding action, unit, and ingredient declarations
+into appropriate environments, and substituting where necessary. For example,
+when a top-level ingredient declaration for Dry Ingredients is encountered,
+it’s name is bound to it’s corresponding ingredient expression and, when the 
+name Dry Ingredients is encountered later in the recipe, it will be
+substituted for the corresponding ingredient expression. Finally, all
+top-level ingredient expressions, action bindings, and unit bindings are
+bound to corresponding variables in Haskell to be used by the programmer.
+After the reification process, each ingredient expression bound in Haskell
+will have all references to other ingredients declared in the recipe
+substituted.
+
+\section{Example Usage}\label{sec:exampleusage}
+Among our primary motivations for the language was the desire for a platform
+upon which to build cooking-related applications. To demonstrate the power and
+usability of GastroGnome as a foundation for apps, we have implemented a few
+of examples as a proof of concept. While not wrapped into polished apps, they
+show that functionality can be quickly reached when the data representation is
+abstracted into GastroGnome.  The first is a simple program which constructs a
+shopping list given a list of ingredients already available and one or more
+recipes to buy for. The program extracts the ingredients and quantities from
+the recipe and simply subtracts the ingredients which are already owned. The
+code for this application was relatively straightforward and implemented in 46
+lines of Haskell.
+
+It is widely accepted that one of the most difficult things to master as a
+chef is getting multiple dishes to finish at the same time. The second
+application aims to remedy this by converting a list of GastroGnome recipes
+into a sequence of time-indexed actions. Given a desired meal time, following
+the resulting steps at the computed time will ensure that the recipes finish
+simultaneously. This can easily be converted into a notification-based
+application for a phone or tablet which sits on the counter as the chef works,
+ensuring steps are done in the optimal order and that all of the dishes are
+done on time. This application was implemented in 80 lines of Haskell.
+
+\section{Evaluation}
+In order to evaluate the success of GastroGnome, we intend to compare recipes
+written in natural language (as it would appear in a cookbook) with their
+representations in GastroGnome. The recipes will be compared on the grounds of
+length, readability, and accessibility to non-programmers. In our limited
+testing, GastroGnome recipe translations are on average shorter than their
+English counterparts. As both designers of the language and experienced
+programmers, we acknowledge our own biases and can speak neither on the
+readability of the language nor the ease of interpretation by a chef without
+programming experience.
+
+We also intend to assess the barrier to entry for the language by asking
+non-experts to read a simple introduction document, then test their ability to
+produce GastroGnome translations of real recipes taken from cookbooks. We hope
+that even the most lay of people will exhibit the capacity to produce
+consistent translations and that two subjects given the same task will produce
+functionally (if not syntactically) identical GastroGnome programs.
+
+\section{Future Work}
+While we believe GastroGnome is already in a very usable state, there are a
+number of language features we would like to see in the future. There are a
+few noticeable gaps in GastroGnome, one of which is the handling of units.
+Currently, units are essentially treated as string atoms. We would like to
+support unit conversion and user-defined units in the future. Another issue is
+the lack of representation of appliances and cooking tools such as a pans or
+ovens. Currently these are implemented as ingredients and referenced in action
+modifiers. We feel this could be remedied by adding a language construct for
+such appliances. Similarly, we feel support for certain key modifiers such as
+temperatures and cooking time could be better supported. We will also consider
+the benefits of a stronger type system and type checking to aid in writing
+recipes.
+
+We hope also to integrate import and export of GastroGnome recipes to and from
+files or structured data storage. The ability to keep large, organized
+collections of recipes is a crucial function for recipes. One of the great
+benefits to having a programming language for recipes is the potential for
+code re-use. Recipes could reference components from other recipes (e.g.
+define Blueberry Waffles as Waffle Batter plus Blueberries). This will require
+increased support for namespace and scoping.
+
+There are also a number of tools which might prove useful including a visual
+recipe editor which can toggle between an ingredient tree and a sequential
+step view of the recipe. We are also interested in the potential for a
+GastroGnome to be compiled to run on cooking robots. While the realization of
+an automated chef may not be imminent, we believe a standardized language
+could be a large boon to the development of cooking robots, and that the
+existence of such robots might, in turn, help drive the development of
+GastroGnome.
+
+In a similar vein, there is room for integration of natural language
+processing to translate recipes between English (or other languages) and
+GastroGnome. This, while perhaps just out of reach of current technologies,
+could provide a much larger base of recipes for GastroGnome without additional
+effort to write new recipes explicitly in the language.
+
+
+\section{Conclusion}
+To be written.
+
+\section{Related Work}
+
+\section{Acknowledgements}
+
+
+\bibliography{references}
+\bibliographystyle{abbrvnat}
+\nocite{*}
+
+\end{document}

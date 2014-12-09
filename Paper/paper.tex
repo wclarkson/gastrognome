@@ -16,16 +16,8 @@
 \usepackage{listings}          % format code
 \usepackage{enumitem}      % adjust spacing in enums
 \usepackage[colorlinks=true,allcolors=blue,breaklinks,draft=false]{hyperref}   % hyperlinks, including DOIs and URLs in bibliography
-% known bug: http://tex.stackexchange.com/questions/1522/pdfendlink-ended-up-in-different-nesting-level-than-pdfstartlink
-\newcommand{\doi}[1]{doi:~\href{http://dx.doi.org/#1}{\Hurl{#1}}}   % print a hyperlinked DOI
-
-
 
 \begin{document}
-
-%
-% any author declaration will be ignored  when using 'plid' option (for double blind review)
-%
 
 \title{GastroGnome: A Language for Recipes}
 \authorinfo{William Clarkson}{}{william.clarkson@tufts.edu}
@@ -63,17 +55,17 @@ increasingly complex parts, starting with atomic data.
 
 \section{Design}
 We settled on a simple syntax for the language, with a handful of declaration
-forms and expression forms, for which we provide some examples in Figure
-\ref{fig:expdec}. A named recipe is introduced with an ingredient declaration,
-and its right-hand side, so to speak, is composed of an ingredient, which can
-be a single atomic ingredient quantity expression, or an action which combines
-a list of ingredients. Quantity declarations enable the default quantity for
-an ingredient to be specified at top level so the names can later be referred
-to without a quantity, as is common practice for many cookbooks. Action
-declarations allow the user to define a new action in terms of another action
-in conjunction with adverbs to specify it more precisely. In natural language
-terms, our grammar for recipes consists of ways of introducing ingredients
-(nouns), and ways of combining ingredients (verbs with optional adverbs).
+forms and expression forms, for which we provide some examples in Figures
+\ref{fig:dec} and \ref{fig:exp}. A named recipe is introduced with an ingredient declaration, and its right-hand side, so to speak, is composed of an ingredient,
+which can be a single atomic ingredient quantity expression, or an action which
+combines a list of ingredients. Quantity declarations enable the default
+quantity for an ingredient to be specified at top level so the names can later
+be referred to without a quantity, as is common practice for many cookbooks.
+Action declarations allow the user to define a new action in terms of another
+action in conjunction with adverbs to specify it more precisely. In natural
+language terms, our grammar for recipes consists of ways of introducing
+ingredients (nouns), and ways of combining ingredients (verbs with optional
+adverbs).
 
 While the compositionality of our language makes it reminiscent of Lisp
 S-expressions, we decided to use required indentation instead of matched
@@ -81,23 +73,18 @@ delimiters like parentheses to structure our code, as we thought this would
 lead to a more readable program, and one which would be less daunting to a
 cook with minimal programming experience.
 
-Waffles example discussed here, seen in Figure \ref{fig:waffles}.
+A full recipe expressed in GastroGnome is shown in Figure \ref{fig:waffles}.
+Several ingredient declarations (e.g. \texttt{Dry} \texttt{Ingredients},
+\texttt{Batter}, etc) are used.  The right-hand side ingredient expression for
+\texttt{Batter} refers to \texttt{Dry} \texttt{Ingredients}, which is defined
+before, demonstrating the use of variable binding. Additionally, the
+ingredients in \texttt{Batter} are defined without explicit quantities, so the
+quantities declared at the top of the recipe will be used, which illustrates
+the use of quantity declarations.  Additionally, an action declaration is used
+to declare the new verb \texttt{INCORPORATE}, in terms of another verb,
+\texttt{BEAT}, which is perhaps more familiar to the chef.
 
 \begin{figure}
-	
-	\caption{Examples of GastroGnome declaration and expression forms}
-	\label{fig:expdec}
-\end{figure}
-\fbox{
-	\begin{tabular}{ l l }
-		Ingredient Declaration & \tt Mixture: $\hookleftarrow$ 1 cup Water \\ 
-		Quantity Declaration & \tt 3 cup Flour \\
-		Action Declaration & \tt WHISK = STIR with "whisk" \\
-		Unit Declaration & \tt 1 gallon = 4 quart
-	\end{tabular}
-}
-
-\fbox{
 	\begin{tabular}{ l l }
 		Ingredient Quantity & \tt 3 cup Flour \rm or \tt 4 Egg \\
 		Name & \tt Flour \\
@@ -105,7 +92,19 @@ Waffles example discussed here, seen in Figure \ref{fig:waffles}.
 		Quantity & \tt 4 tsp \rm or \tt 2 \\
 		Unit & \tt cup \rm or \tt tbsp
 	\end{tabular}
-}
+	\caption{GastroGnome declaration forms}
+	\label{fig:dec}
+\end{figure}	
+\begin{figure}	
+	\begin{tabular}{ l l }
+		Ingredient Declaration & \tt Mixture: $\hookleftarrow$ 1 cup Water \\ 
+		Quantity Declaration & \tt 3 cup Flour \\
+		Action Declaration & \tt WHISK = STIR with "whisk" \\
+		Unit Declaration & \tt 1 gallon = 4 quart
+	\end{tabular}
+	\caption{GastroGnome expression forms}
+	\label{fig:exp}
+\end{figure}
 
 \begin{figure}
 	\begin{verbatim}
@@ -138,8 +137,9 @@ Waffles example discussed here, seen in Figure \ref{fig:waffles}.
 	      Waffle Iron
  
 	Waffles:
-	  COOK at "300 F" in "Prepared Waffle Iron"
-	  until "golden brown"
+	  COOK at "300 F"
+	  	   in "Prepared Waffle Iron"
+	  	   until "golden brown"
 	    Batter	
 	\end{verbatim}
 	\caption{Recipe for waffles expressed in GastroGnome}
@@ -166,19 +166,19 @@ When GastroGnome syntax is quasiquoted in Haskell, it is parsed, using the
 appropriate parser for either full programs (list of GastroGnome declarations)
 or single ingredient expressions, into an algebraic data structure
 representing the abstract syntax. This then undergoes a process which we have
-termed “reification” due to it’s passing similarity to the similar process
-described in the Mainland quasiquoting paper ~\cite{mainland07quasiquoting}.
-The program is traversed, binding action, unit, and ingredient declarations
-into appropriate environments, and substituting where necessary. For example,
-when a top-level ingredient declaration for Dry Ingredients is encountered,
-it’s name is bound to it’s corresponding ingredient expression and, when the 
-name Dry Ingredients is encountered later in the recipe, it will be
-substituted for the corresponding ingredient expression. Finally, all
-top-level ingredient expressions, action bindings, and unit bindings are
-bound to corresponding variables in Haskell to be used by the programmer.
-After the reification process, each ingredient expression bound in Haskell
-will have all references to other ingredients declared in the recipe
-substituted.
+termed “reification” due to it’s passing similarity to the process described
+in the Mainland quasiquoting paper \cite{mainland07quasiquoting}.  The
+program is traversed, binding action, unit, and ingredient declarations into
+appropriate environments, and substituting where necessary. For example, when
+a top-level ingredient declaration for \texttt{Dry Ingredients} is
+encountered, it’s name is bound to it’s corresponding ingredient expression
+and, when the name \texttt{Dry Ingredients} is encountered later in the
+recipe, it will be substituted for the corresponding ingredient expression.
+Finally, all top-level ingredient expressions, action bindings, and unit
+bindings are bound to corresponding variables in Haskell to be used by the
+programmer.  After the reification process, each ingredient expression bound
+in Haskell will have all references to other ingredients declared in the
+recipe substituted.
 
 \section{Example Usage}\label{sec:exampleusage}
 Among our primary motivations for the language was the desire for a platform
@@ -186,12 +186,13 @@ upon which to build cooking-related applications. To demonstrate the power and
 usability of GastroGnome as a foundation for apps, we have implemented a few
 of examples as a proof of concept. While not wrapped into polished apps, they
 show that functionality can be quickly reached when the data representation is
-abstracted into GastroGnome.  The first is a simple program which constructs a
-shopping list given a list of ingredients already available and one or more
-recipes to buy for. The program extracts the ingredients and quantities from
-the recipe and simply subtracts the ingredients which are already owned. The
-code for this application was relatively straightforward and implemented in 46
-lines of Haskell.
+abstracted into GastroGnome.
+
+The first is a simple program which constructs a shopping list given a list of
+ingredients already available and one or more recipes to buy for. The program
+extracts the ingredients and quantities from the recipe and simply subtracts
+the ingredients which are already owned. The code for this application was
+relatively straightforward and implemented in 46 lines of Haskell.
 
 It is widely accepted that one of the most difficult things to master as a
 chef is getting multiple dishes to finish at the same time. The second
@@ -260,12 +261,27 @@ effort to write new recipes explicitly in the language.
 
 
 \section{Conclusion}
-To be written.
+The use of natural language recipes for cooking has a number of flaws, perhaps
+the greatest of which is ambiguity. We introduced GastroGnome as a new
+standardized representation for recipes. Gastrognome aims to remedy many of
+the shortcomings of natural language recipes. We have also demonstrated the
+ease of development of useful applications using GastroGnome as an easy recipe
+representation.
 
 \section{Related Work}
+We researched existing work in this domain and found Cordon Bleu, a related
+language \cite{cordonbleu}. It is more focused on the simulation of flavors
+in recipes, and we found that its more imperative syntax, while suited to its
+stated task, was less ideal for a language which is intended for chefs who
+may have minimal programming experience. We found that it has a large number
+of primitive operations built in, which are necessary for the domain, but we
+decided in contrast to make our language more lightweight and allow the end
+user to use actions as they desire, and defer any interpretation of the
+significance of action names to the tools which consume recipes.
 
 \section{Acknowledgements}
-
+We would like to thank Kathleen Fisher for advice and feedback over the course
+of both planning and development for this project.
 
 \bibliography{references}
 \bibliographystyle{abbrvnat}
